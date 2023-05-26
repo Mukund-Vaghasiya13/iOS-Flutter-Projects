@@ -64,11 +64,11 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
                     setState(() {
                       setState(() {
                         var year = "${DateTime.now().year}";
-                        var month = (DateTime.now().month < 12) ?"0${DateTime.now().month}" : "${DateTime.now().month}";
+                        var month = (DateTime.now().month < 10) ?"0${DateTime.now().month}" : "${DateTime.now().month}";
                         debugPrint(month);
-                        var day = "${DateTime.now().day}";
+                        var day = (DateTime.now().day < 10)? "0${DateTime.now().day - 1}" :"${DateTime.now().day - 1}";
                             loadData(
-                                "https://newsapi.org/v2/everything?q=$Value&from=${year}-${month}-${day}&sortBy=popularity&apiKey=750a1ffc45194fe0922a46ad88c2be79");
+                                "https://newsapi.org/v2/everything?q=$Value&from=$year-$month-$day&sortBy=publishedAt&apiKey=750a1ffc45194fe0922a46ad88c2be79");
                           });
                     });
                   }, icon: const Icon(CupertinoIcons.search)),
@@ -76,7 +76,7 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
                 ],
               ),
               Expanded(
-                child:(showindicator)? Center(child: CircularProgressIndicator()):ListView.builder(
+                child:(showindicator)? Center(child: CircularProgressIndicator()):(datanotfound)?Center(child: Text("Oops!,Data not found"),):ListView.builder(
                   itemCount: list.length,
                   itemBuilder: (context, index) {
                     return Link(
@@ -148,6 +148,7 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
 
   void loadData(String URL) async {
     setState(() {
+      datanotfound = false;
       showindicator = true;
     });
     debugPrint(URL);
@@ -162,9 +163,13 @@ class _SearchBarScreenState extends State<SearchBarScreen> {
         list = List.from(sepcData).map((e) => ApiNewsOrg.fromJson(e)).toList();
         debugPrint("$list");
         showindicator = false;
+        if(list.isEmpty)
+        {
+          datanotfound = true;
+        }
       });
     }
     
   }
 }
-//https://newsapi.org/v2/everything?q=Apple&from=2023-05-25&sortBy=popularity&apiKey=API_KEY
+//https://newsapi.org/v2/everything?q=Apple&from=2023-05-26&sortBy=popularity&apiKey=750a1ffc45194fe0922a46ad88c2be79
